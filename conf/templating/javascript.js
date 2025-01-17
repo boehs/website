@@ -1,5 +1,3 @@
-import { minify as minifyTs } from "terser";
-import { build as esbuild } from "esbuild";
 import textInject from "../../utils/text-inject.js";
 
 function evalInContext(js, context) {
@@ -17,7 +15,9 @@ export default function javascript(eleventyConfig) {
         compile: async function (inputContent, inputPath) {
             return async (data) => {
                 let result = (
-                    await esbuild({
+                    await (
+                        await import("esbuild")
+                    ).build({
                         entryPoints: [inputPath],
                         define: {},
                         //format: "esm",
@@ -30,7 +30,9 @@ export default function javascript(eleventyConfig) {
                 if (process.env.ELEVENTY_ENV === "production") {
                     // @ts-ignore
                     result = (
-                        await minifyTs(result, {
+                        await (
+                            await import("terser")
+                        ).minify(result, {
                             module: true,
                             ecma: 2017,
                             compress: {

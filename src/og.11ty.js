@@ -1,6 +1,3 @@
-import { svg } from "../utils/ogHelpers.js";
-import { Resvg } from "@resvg/resvg-js";
-
 export default class Og {
     data() {
         return {
@@ -25,7 +22,9 @@ export default class Og {
         };
     }
     async render(page) {
-        let svgd = await svg({
+        let svgd = await (
+            await import("../utils/ogHelpers.js")
+        ).svg({
             title: page.entry.data.title,
             desc: page.entry.data.description,
             date: page.entry.data.date?.toLocaleDateString(),
@@ -35,7 +34,7 @@ export default class Og {
     }
 }
 
-function renderSvg(svgd) {
+async function renderSvg(svgd) {
     /**
      * @type {import("@resvg/resvg-js").ResvgRenderOptions}
      */
@@ -44,6 +43,8 @@ function renderSvg(svgd) {
             loadSystemFonts: false,
         },
     };
-    const png = new Resvg(svgd, options).render().asPng();
+    const png = new (await import("@resvg/resvg-js")).Resvg(svgd, options)
+        .render()
+        .asPng();
     return png;
 }

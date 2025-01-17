@@ -1,7 +1,4 @@
-import { minify } from "html-minifier";
-
 import { createRequire } from "node:module";
-import { readFileSync } from "fs";
 
 const require = createRequire(import.meta.url);
 const collectionControl = require("./src/_data/collectionsControl.json");
@@ -51,13 +48,13 @@ export default function (eleventyConfig) {
         "./src/pages/garden/node/Assets/*": "assets",
     });
 
-    eleventyConfig.addTransform("html", function (content) {
+    eleventyConfig.addTransform("html", async function (content) {
         if (
             this.page.outputPath &&
             this.page.outputPath.endsWith(".html") &&
             process.env.ELEVENTY_ENV == "production"
         ) {
-            return minify(content, {
+            return (await import("html-minifier")).minify(content, {
                 useShortDoctype: true,
                 removeComments: true,
                 collapseWhitespace: true,
