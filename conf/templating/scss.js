@@ -1,4 +1,3 @@
-import * as sass from "sass";
 import postcss from "postcss";
 import path from "path";
 import postcsso from "postcss-csso";
@@ -11,10 +10,13 @@ export default function scss(eleventyConfig) {
         compile: async function (inputContent, inputPath) {
             if (inputPath.split("/").at(-1).startsWith("_")) return;
 
-            let { css, loadedUrls } = sass.compileString(inputContent, {
-                loadPaths: [path.parse(inputPath).dir || "."],
-                sourceMap: false,
-            });
+            let { css, loadedUrls } = (await import("sass")).compileString(
+                inputContent,
+                {
+                    loadPaths: [path.parse(inputPath).dir || "."],
+                    sourceMap: false,
+                },
+            );
 
             this.addDependencies(inputPath, loadedUrls);
 

@@ -12,34 +12,34 @@ import slugify from "../../../utils/slugify.js";
 
 import iterator from "markdown-it-for-inline";
 
-import Shiki from "@shikijs/markdown-it";
 import { transformerNotationDiff } from "@shikijs/transformers";
 import { gruvBoxDarkHard } from "./highlight.js";
-import { inject } from "./widgets/widgets.js";
 
 const proxy = (tokens, idx, options, env, self) =>
     self.renderToken(tokens, idx, options);
 
-const shiki = await Shiki({
-    langs: [
-        "html",
-        "css",
-        "scss",
-        "javascript",
-        "typescript",
-        "json",
-        "yaml",
-        "shell",
-        "graphql",
-        "rust",
-        "swift",
-        "regex",
-        "toml",
-        "liquid",
-    ],
-    theme: gruvBoxDarkHard,
-    transformers: [transformerNotationDiff()],
-});
+async function shiki() {
+    return (await import("@shikijs/markdown-it")).default({
+        langs: [
+            "html",
+            "css",
+            "scss",
+            "javascript",
+            "typescript",
+            "json",
+            "yaml",
+            "shell",
+            "graphql",
+            "rust",
+            "swift",
+            "regex",
+            "toml",
+            "liquid",
+        ],
+        theme: gruvBoxDarkHard,
+        transformers: [transformerNotationDiff()],
+    });
+}
 
 let options = {
     html: true,
@@ -204,7 +204,9 @@ export function markdownTemplate(eleventyConfig) {
                 }
                 result = markdownIt.render(result, data);
                 if (result.includes("___")) {
-                    result = await inject(result);
+                    result = await (
+                        await import("./widgets/widgets.js")
+                    ).inject(result);
                 }
                 return result;
             };
